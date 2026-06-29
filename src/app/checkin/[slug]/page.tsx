@@ -1,18 +1,33 @@
 import React from 'react';
 import { readDb } from '@/lib/db';
-import VisitorBoard from '@/components/VisitorBoard';
+import CheckinForm from '@/components/CheckinForm';
 import { Metadata } from 'next';
+import { notFound } from 'next/navigation';
 
-export const metadata: Metadata = {
-  title: '서울윤중초등학교 - 실시간 방문 현황판',
-  description: '서울윤중초등학교 실시간 방문객 현황판 페이지입니다.',
-};
+interface Props {
+  params: Promise<{ slug: string }>;
+}
 
-export default async function HomePage() {
+export async function generateMetadata({ params }: Props): Promise<Metadata> {
+  const { slug } = await params;
   const db = await readDb();
-  const school = db.schools[0]; // Always default to Seoul Yunjung Elementary School
+  const school = db.schools.find((s) => s.slug === slug);
+  return {
+    title: `${school?.name || '학교'} - 방문객 출입 등록`,
+    description: `${school?.name || '학교'} 전자 방문객 출입 명부 페이지입니다.`,
+  };
+}
 
-  if (!school || !school.webAppUrl) {
+export default async function CheckinPage({ params }: Props) {
+  const { slug } = await params;
+  const db = await readDb();
+  const school = db.schools.find((s) => s.slug === slug);
+
+  if (!school) {
+    notFound();
+  }
+
+  if (!school.webAppUrl) {
     return (
       <div className="container" style={{ justifyContent: 'center', minHeight: '80vh' }}>
         <div className="card" style={{ textAlign: 'center', borderColor: 'var(--error)', maxWidth: '520px' }}>
@@ -33,8 +48,8 @@ export default async function HomePage() {
   }
 
   return (
-    <main className="container" style={{ maxWidth: '1200px' }}>
-      <VisitorBoard school={school} />
+    <main>
+      <CheckinForm school={school} />
     </main>
   );
 }

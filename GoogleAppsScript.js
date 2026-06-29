@@ -45,6 +45,27 @@ function doPost(e) {
     
     // 2. 방문 등록 (Check-in)
     if (action === 'checkin') {
+      var lastRow = sheet.getLastRow();
+      
+      // 이전 기록의 날짜와 현재 저장하는 날짜가 다르면 구분선 행을 삽입합니다.
+      if (lastRow > 1) {
+        var lastDate = sheet.getRange(lastRow, 1).getDisplayValue().toString().trim();
+        if (lastDate && lastDate !== requestData.date) {
+          // A열에 날짜 구분선을 띄우고 배경색을 설정합니다.
+          var dividerRow = [
+            '--- ' + requestData.date + ' ---', // A: 구분 표시
+            '', '', '', '', '', '', '', ''
+          ];
+          sheet.appendRow(dividerRow);
+          
+          // 새로 삽입된 구분 행의 배경색을 연한 회색(#e2e8f0)으로 처리하여 시인성을 확보합니다.
+          var dividerRange = sheet.getRange(lastRow + 1, 1, 1, 9);
+          dividerRange.setBackground('#e2e8f0');
+          dividerRange.setFontColor('#475569');
+          dividerRange.setFontWeight('bold');
+        }
+      }
+
       var rowData = [
         requestData.date,          // A: 방문 일자
         requestData.checkinTime,   // B: 입장 시간

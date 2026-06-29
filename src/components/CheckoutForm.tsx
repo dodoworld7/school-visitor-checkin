@@ -2,6 +2,7 @@
 
 import React, { useState } from 'react';
 import { useRouter } from 'next/navigation';
+import Link from 'next/link';
 import { formatPhoneNumber, validatePhoneNumber } from '@/lib/utils';
 
 interface CheckoutFormProps {
@@ -100,6 +101,40 @@ export default function CheckoutForm({ schoolSlug, schoolName }: CheckoutFormPro
         </button>
       </div>
 
+      {/* Back to Home Button (Full Width Card) */}
+      <div style={{ marginBottom: '16px', width: '100%' }}>
+        <Link href="/" style={{
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          gap: '8px',
+          textDecoration: 'none',
+          color: 'var(--primary)',
+          fontSize: 'var(--text-base)',
+          fontWeight: '700',
+          background: 'var(--bg-card)',
+          backdropFilter: 'blur(12px)',
+          border: '1px solid var(--border)',
+          borderRadius: 'var(--radius-md)',
+          padding: '16px 20px',
+          boxShadow: 'var(--shadow-md)',
+          transition: 'all 0.2s',
+          width: '100%',
+          textAlign: 'center'
+        }}
+        onMouseEnter={(e) => {
+          e.currentTarget.style.borderColor = 'var(--primary)';
+          e.currentTarget.style.boxShadow = 'var(--shadow-md), var(--shadow-glow)';
+        }}
+        onMouseLeave={(e) => {
+          e.currentTarget.style.borderColor = 'var(--border)';
+          e.currentTarget.style.boxShadow = 'var(--shadow-md)';
+        }}
+        >
+          🏠 실시간 방문 현황판(메인화면)으로 돌아가기
+        </Link>
+      </div>
+
       <div className="card">
         <div style={{ textAlign: 'center', marginBottom: '24px' }}>
           <span style={{ color: 'var(--fg-secondary)', fontWeight: 'bold', fontSize: 'var(--text-lg)' }}>방문객 퇴장 등록</span>
@@ -139,6 +174,13 @@ export default function CheckoutForm({ schoolSlug, schoolName }: CheckoutFormPro
               className="btn btn-secondary"
             >
               새 방문 등록하기
+            </button>
+            <button
+              onClick={() => router.push('/')}
+              className="btn btn-primary"
+              style={{ marginTop: '12px' }}
+            >
+              🏠 실시간 현황판(홈)으로 이동
             </button>
           </div>
         ) : (
