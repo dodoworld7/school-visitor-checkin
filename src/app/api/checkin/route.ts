@@ -28,7 +28,7 @@ export async function POST(request: NextRequest) {
     }
 
     // 4. Input Validations
-    if (!schoolSlug || !name || !contact || !purpose || !host) {
+    if (!name || !contact || !purpose || !host) {
       return NextResponse.json(
         { message: '필수 항목이 누락되었습니다.' },
         { status: 400 }
@@ -44,10 +44,10 @@ export async function POST(request: NextRequest) {
 
     // 5. Look up school details
     const db = await readDb();
-    const school = db.schools.find(s => s.slug === schoolSlug);
-    if (!school) {
+    const school = db.schools[0]; // Always default to Seoul Yunjung Elementary
+    if (!school || !school.webAppUrl) {
       return NextResponse.json(
-        { message: '등록되지 않은 학교 정보입니다.' },
+        { message: '스프레드시트 연동 웹앱 주소가 설정되지 않았습니다.' },
         { status: 404 }
       );
     }

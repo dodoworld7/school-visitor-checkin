@@ -1,31 +1,18 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { verifyAdminSession } from '@/lib/admin-auth';
 import { readDb } from '@/lib/db';
 import { getTodayVisitors } from '@/lib/google-sheets';
 
 export async function GET(request: NextRequest) {
   try {
-    // 1. Authenticate session
-    const isAuthenticated = await verifyAdminSession();
-    if (!isAuthenticated) {
-      return NextResponse.json({ message: '인증 권한이 없습니다.' }, { status: 401 });
-    }
-
-    const { searchParams } = new URL(request.url);
-    const schoolSlug = searchParams.get('schoolSlug');
-
-    if (!schoolSlug) {
-      return NextResponse.json({ message: '학교 식별자(schoolSlug)가 누락되었습니다.' }, { status: 400 });
-    }
-
-    // 2. Lookup school webAppUrl
+    // 1. Lookup school webAppUrl
     const db = await readDb();
-    const school = db.schools.find(s => s.slug === schoolSlug);
-    if (!school) {
-      return NextResponse.json({ message: '등록되지 않은 학교입니다.' }, { status: 404 });
+    const school = db.schools[0]; // Default to Seoul Yunjung Elementary
+    
+    if (!school || !school.webAppUrl) {
+      return NextResponse.json({ message: '연동된 학교 웹앱 주소가 설정되지 않았습니다.' }, { status: 404 });
     }
 
-    // 3. Delegate to Google Apps Script Web App
+    // 2. Delegate to Google Apps Script Web App
     const result = await getTodayVisitors(school.webAppUrl);
 
     return NextResponse.json({

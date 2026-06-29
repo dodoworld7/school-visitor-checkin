@@ -41,19 +41,50 @@ const defaultData: DatabaseSchema = {
  * Creates directory and file with defaults if they don't exist.
  */
 export async function readDb(): Promise<DatabaseSchema> {
+  // 1. Prepare virtual Yunjung Elementary School template
+  const yunjungWebAppUrl = process.env.YUNJUNG_WEBAPP_URL || '';
+  
   try {
-    if (!fs.existsSync(DB_DIR)) {
-      fs.mkdirSync(DB_DIR, { recursive: true });
-    }
-    if (!fs.existsSync(DB_FILE)) {
+    let db: DatabaseSchema = { ...defaultData };
+    
+    if (fs.existsSync(DB_FILE)) {
+      const data = await fs.promises.readFile(DB_FILE, 'utf-8');
+      db = JSON.parse(data) as DatabaseSchema;
+    } else if (fs.existsSync(DB_DIR)) {
+      // Create if file doesn't exist
       fs.writeFileSync(DB_FILE, JSON.stringify(defaultData, null, 2), 'utf-8');
-      return defaultData;
     }
-    const data = await fs.promises.readFile(DB_FILE, 'utf-8');
-    return JSON.parse(data) as DatabaseSchema;
+    
+    // 2. Override with single-school logic (Seoul Yunjung)
+    // If environment variable is set, it overrides and locks down Yunjung Elementary School
+    const spreadsheetUrl = db.schools.find(s => s.slug === 'yunjung' || s.name.includes('윤중'))?.spreadsheetUrl 
+      || db.schools[0]?.spreadsheetUrl 
+      || 'https://docs.google.com/spreadsheets';
+
+    db.schools = [{
+      id: 'yunjung-elementary-school-id',
+      slug: 'yunjung',
+      name: '서울윤중초등학교',
+      webAppUrl: yunjungWebAppUrl || db.schools[0]?.webAppUrl || '',
+      spreadsheetUrl: spreadsheetUrl,
+      createdAt: new Date().toISOString()
+    }];
+    
+    return db;
   } catch (error) {
-    console.error('Failed to read database file, returning defaults:', error);
-    return defaultData;
+    console.error('Failed to read database file, returning virtual school:', error);
+    
+    return {
+      schools: [{
+        id: 'yunjung-elementary-school-id',
+        slug: 'yunjung',
+        name: '서울윤중초등학교',
+        webAppUrl: yunjungWebAppUrl,
+        spreadsheetUrl: 'https://docs.google.com/spreadsheets',
+        createdAt: new Date().toISOString()
+      }],
+      admin: defaultData.admin
+    };
   }
 }
 

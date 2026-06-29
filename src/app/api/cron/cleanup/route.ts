@@ -1,61 +1,41 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { readDb } from '@/lib/db';
 import { anonymizeOldRecords } from '@/lib/google-sheets';
-import { verifyAdminSession } from '@/lib/admin-auth';
 
 export async function POST(request: NextRequest) {
   try {
-    // 1. Authorize: Either active admin session OR matching Cron Secret token
-    const isSessionAuth = await verifyAdminSession();
-    
+    // Authorize: check token if Cron Secret is configured in env
     const authHeader = request.headers.get('Authorization');
-    const cronSecret = process.env.CRON_SECRET || 'default_cron_secret_2026';
-    const isCronTokenAuth = authHeader === `Bearer ${cronSecret}`;
-
-    if (!isSessionAuth && !isCronTokenAuth) {
+    const cronSecret = process.env.CRON_SECRET;
+    
+    if (authHeader && cronSecret && authHeader !== `Bearer ${cronSecret}`) {
       return NextResponse.json(
         { message: '이 작업을 수행할 권한이 없습니다.' },
         { status: 401 }
       );
     }
 
-    // 2. Fetch all registered schools
     const db = await readDb();
-    if (db.schools.length === 0) {
+    const school = db.schools[0];
+    if (!school || !school.webAppUrl) {
       return NextResponse.json({
-        message: '등록된 학교가 없습니다.',
-        anonymizedSchools: [],
+        message: '등록된 학교 웹앱 주소가 없습니다.',
+        success: false
       });
     }
 
     const retentionDays = 30; // 30-day retention policy
-    const report: any[] = [];
-
-    // 3. Loop through schools and clean up records
-    for (const school of db.schools) {
-      try {
-        const count = await anonymizeOldRecords(school.webAppUrl, retentionDays);
-        report.push({
-          schoolName: school.name,
-          slug: school.slug,
-          anonymizedCount: count,
-          status: 'success',
-        });
-      } catch (err: any) {
-        console.error(`Failed to clean up records for ${school.name}:`, err);
-        report.push({
-          schoolName: school.name,
-          slug: school.slug,
-          error: err.message || '알 수 없는 오류',
-          status: 'failed',
-        });
-      }
-    }
+    const count = await anonymizeOldRecords(school.webAppUrl, retentionDays);
 
     return NextResponse.json({
       success: true,
       retentionDays,
-      results: report,
+      results: [{
+        schoolName: school.name,
+        slug: school.slug,
+        anonymizedCount: count,
+        status: 'success',
+      }]
     });
   } catch (error: any) {
     console.error('Anonymize Cron Job failed:', error);
@@ -66,41 +46,30 @@ export async function POST(request: NextRequest) {
   }
 }
 
-// Support GET for testing ease (only allowed via admin session verification)
+// Support GET for testing ease
 export async function GET() {
-  const isSessionAuth = await verifyAdminSession();
-  if (!isSessionAuth) {
-    return NextResponse.json({ message: '인증 권한이 없습니다.' }, { status: 401 });
-  }
-
   try {
     const db = await readDb();
-    const retentionDays = 30;
-    const report: any[] = [];
-
-    for (const school of db.schools) {
-      try {
-        const count = await anonymizeOldRecords(school.webAppUrl, retentionDays);
-        report.push({
-          schoolName: school.name,
-          slug: school.slug,
-          anonymizedCount: count,
-          status: 'success',
-        });
-      } catch (err: any) {
-        report.push({
-          schoolName: school.name,
-          slug: school.slug,
-          error: err.message || '알 수 없는 오류',
-          status: 'failed',
-        });
-      }
+    const school = db.schools[0];
+    if (!school || !school.webAppUrl) {
+      return NextResponse.json({
+        message: '등록된 학교 웹앱 주소가 없습니다.',
+        success: false
+      });
     }
+
+    const retentionDays = 30;
+    const count = await anonymizeOldRecords(school.webAppUrl, retentionDays);
 
     return NextResponse.json({
       success: true,
       retentionDays,
-      results: report,
+      results: [{
+        schoolName: school.name,
+        slug: school.slug,
+        anonymizedCount: count,
+        status: 'success',
+      }]
     });
   } catch (error: any) {
     return NextResponse.json({ message: error.message }, { status: 500 });

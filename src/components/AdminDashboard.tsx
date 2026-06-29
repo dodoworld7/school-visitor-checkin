@@ -351,8 +351,8 @@ export default function AdminDashboard({ initialSchools }: AdminDashboardProps) 
           alignItems: 'center'
         }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-            <span style={{ fontSize: '24px' }}>🏫</span>
-            <span style={{ fontWeight: 'bold', fontSize: 'var(--text-lg)' }}>방문객 출입관리 통합관리자</span>
+            <span style={{ fontSize: '24px' }}>🛡️</span>
+            <span style={{ fontWeight: 'bold', fontSize: 'var(--text-lg)' }}>서울윤중초등학교 출입관리 시스템</span>
           </div>
 
           <div style={{ display: 'flex', gap: '16px', alignItems: 'center' }}>
@@ -385,24 +385,9 @@ export default function AdminDashboard({ initialSchools }: AdminDashboardProps) 
                   fontSize: 'var(--text-sm)'
                 }}
               >
-                ⚙️ 학교 및 시트 관리
+                ⚙️ 구글 시트 연동 설정
               </button>
             </nav>
-
-            <button
-              onClick={handleLogout}
-              style={{
-                background: 'transparent',
-                border: '1px solid var(--border)',
-                padding: '6px 12px',
-                borderRadius: 'var(--radius-sm)',
-                cursor: 'pointer',
-                fontSize: 'var(--text-xs)',
-                color: 'var(--fg-secondary)'
-              }}
-            >
-              로그아웃
-            </button>
           </div>
         </div>
       </header>
@@ -441,23 +426,9 @@ export default function AdminDashboard({ initialSchools }: AdminDashboardProps) 
                 <p className="subtitle" style={{ fontSize: 'var(--text-sm)' }}>실시간 학교 방문 현황입니다.</p>
               </div>
 
-              {/* School Selector dropdown */}
-              <div>
-                <select
-                  className="form-control"
-                  style={{ fontSize: 'var(--text-base)', padding: '10px 32px 10px 16px', width: '260px' }}
-                  value={selectedSchoolSlug}
-                  onChange={(e) => setSelectedSchoolSlug(e.target.value)}
-                  disabled={schools.length === 0}
-                >
-                  {schools.length === 0 ? (
-                    <option value="">등록된 학교 없음</option>
-                  ) : (
-                    schools.map(s => (
-                      <option key={s.id} value={s.slug}>{s.name}</option>
-                    ))
-                  )}
-                </select>
+              {/* Single Yunjung School indicator */}
+              <div style={{ fontSize: 'var(--text-sm)', color: 'var(--fg-secondary)', fontWeight: 'bold', padding: '6px 12px', background: 'var(--bg-card)', border: '1px solid var(--border)', borderRadius: 'var(--radius-sm)' }}>
+                서울윤중초등학교 전용
               </div>
             </div>
 
@@ -619,22 +590,20 @@ export default function AdminDashboard({ initialSchools }: AdminDashboardProps) 
               
               {/* New School Registration Card */}
               <div className="card">
-                <h2 style={{ fontSize: 'var(--text-xl)', fontWeight: 'bold', marginBottom: '8px' }}>신규 학교 등록</h2>
+                <h2 style={{ fontSize: 'var(--text-xl)', fontWeight: 'bold', marginBottom: '8px' }}>구글 시트 연동 주소 설정</h2>
                 <p className="subtitle" style={{ fontSize: 'var(--text-sm)', marginBottom: '24px' }}>
-                  학교 구글 스프레드시트의 **[확장 프로그램] &gt; [Apps Script]** 에서 배포된 웹앱 주소(URL)를 입력해 주세요.
+                  서울윤중초등학교 구글 스프레드시트의 **[확장 프로그램] &gt; [Apps Script]** 에서 배포된 웹앱 주소(URL)를 입력해 주세요.
                 </p>
 
                 <form onSubmit={handleRegisterSchool}>
-                  <div className="form-group">
+                  {/* Fixed School Name to Seoul Yunjung */}
+                  <div className="form-group" style={{ display: 'none' }}>
                     <label className="form-label">학교명</label>
                     <input
                       type="text"
                       className="form-control"
-                      placeholder="예: 서울윤중초등학교"
-                      value={newSchoolName}
-                      onChange={(e) => setNewSchoolName(e.target.value)}
-                      disabled={registering}
-                      required
+                      value="서울윤중초등학교"
+                      readOnly
                     />
                   </div>
 
@@ -671,7 +640,7 @@ export default function AdminDashboard({ initialSchools }: AdminDashboardProps) 
                     className="btn btn-primary"
                     disabled={registering}
                   >
-                    {registering ? '앱스 스크립트 연동테스트 중...' : '학교 연결 및 등록'}
+                    {registering ? '앱스 스크립트 연동테스트 중...' : '연동 주소 설정 및 테스트'}
                   </button>
                 </form>
               </div>
@@ -716,22 +685,22 @@ export default function AdminDashboard({ initialSchools }: AdminDashboardProps) 
 
             </div>
 
-            {/* Registered Schools List */}
+            {/* Registered Schools List (Connected Google Sheet Info) */}
             <div>
               <div className="card" style={{ height: '100%', display: 'flex', flexDirection: 'column' }}>
                 <h2 style={{ fontSize: 'var(--text-xl)', fontWeight: 'bold', marginBottom: '16px' }}>
-                  등록된 학교 목록 ({schools.length})
+                  연동된 구글 시트 정보
                 </h2>
 
                 {schools.length === 0 ? (
                   <div style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'var(--fg-secondary)' }}>
-                    등록된 학교 정보가 없습니다.
+                    연동 설정된 정보가 없습니다.
                   </div>
                 ) : (
                   <div style={{ overflowY: 'auto', flex: 1, display: 'flex', flexDirection: 'column', gap: '16px' }}>
                     {schools.map((school) => {
                       const origin = typeof window !== 'undefined' ? window.location.origin : '';
-                      const checkinUrl = `${origin}/checkin/${school.slug}`;
+                      const checkinUrl = origin;
                       return (
                         <div 
                           key={school.id} 
@@ -749,23 +718,13 @@ export default function AdminDashboard({ initialSchools }: AdminDashboardProps) 
                             <div>
                               <strong style={{ fontSize: 'var(--text-base)' }}>{school.name}</strong>
                               <div style={{ fontSize: 'var(--text-xs)', color: 'var(--fg-secondary)', marginTop: '2px' }}>
-                                등록일: {new Date(school.createdAt).toLocaleDateString()}
+                                최초 연동일: {new Date(school.createdAt).toLocaleDateString()}
                               </div>
                             </div>
-                            <span style={{
-                              background: 'rgba(96, 165, 250, 0.1)',
-                              color: 'var(--primary)',
-                              fontSize: 'var(--text-xs)',
-                              fontWeight: 'bold',
-                              padding: '2px 6px',
-                              borderRadius: 'var(--radius-sm)'
-                            }}>
-                              {school.slug}
-                            </span>
                           </div>
 
                           <div style={{ fontSize: 'var(--text-sm)' }}>
-                            <div style={{ color: 'var(--fg-secondary)' }}>출입 등록 주소(URL)</div>
+                            <div style={{ color: 'var(--fg-secondary)' }}>방문객 출입 등록 주소 (QR 연결 링크)</div>
                             <a 
                               href={checkinUrl} 
                               target="_blank" 

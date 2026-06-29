@@ -1,57 +1,40 @@
 import React from 'react';
-import Link from 'next/link';
+import { readDb } from '@/lib/db';
+import CheckinForm from '@/components/CheckinForm';
+import { Metadata } from 'next';
 
-export default function Home() {
-  return (
-    <div style={{
-      minHeight: '100vh',
-      display: 'flex',
-      alignItems: 'center',
-      justifyContent: 'center',
-      background: 'linear-gradient(135deg, var(--bg-primary) 0%, #1e1b4b 100%)',
-      padding: '16px'
-    }}>
-      <div className="card" style={{ width: '100%', maxWidth: '520px', textAlign: 'center' }}>
-        <div style={{ marginBottom: '24px' }}>
-          <span style={{ fontSize: '64px', display: 'block', marginBottom: '16px' }}>🛡️</span>
-          <span style={{ color: 'var(--primary)', fontWeight: 'bold', fontSize: 'var(--text-lg)', letterSpacing: '1px' }}>
-            SCHOOL SAFETY NET
-          </span>
-          <h1 style={{ marginTop: '8px', fontSize: 'var(--text-3xl)' }}>학교 방문객 출입관리</h1>
-          <p className="subtitle" style={{ fontSize: 'var(--text-base)', marginTop: '8px' }}>
-            QR 코드를 이용한 빠르고 안전한 전자 방문증 관리 시스템
+export const metadata: Metadata = {
+  title: '서울윤중초등학교 - 방문객 출입 등록',
+  description: '서울윤중초등학교 전자 방문객 출입 명부 페이지입니다.',
+};
+
+export default async function CheckinPage() {
+  const db = await readDb();
+  const school = db.schools[0]; // Always default to Seoul Yunjung Elementary School
+
+  if (!school || !school.webAppUrl) {
+    return (
+      <div className="container" style={{ justifyContent: 'center', minHeight: '80vh' }}>
+        <div className="card" style={{ textAlign: 'center', borderColor: 'var(--error)', maxWidth: '520px' }}>
+          <div style={{ fontSize: '64px', marginBottom: '16px' }}>⚠️</div>
+          <h1 style={{ color: 'var(--error)', fontSize: 'var(--text-xl)', marginBottom: '12px' }}>
+            시스템 설정 대기 중
+          </h1>
+          <p className="subtitle" style={{ fontSize: 'var(--text-sm)', marginBottom: '24px', lineHeight: '1.6' }}>
+            구글 스프레드시트 연동 설정이 아직 완료되지 않았습니다.<br />
+            아래 버튼을 눌러 관리자 페이지로 이동하신 뒤, 구글 앱스 스크립트 웹앱 주소를 등록해 주세요.
           </p>
-        </div>
-
-        <div style={{
-          background: 'var(--bg-primary)',
-          border: '1px solid var(--border)',
-          borderRadius: 'var(--radius-md)',
-          padding: '20px',
-          textAlign: 'left',
-          marginBottom: '28px',
-          fontSize: 'var(--text-sm)',
-          color: 'var(--fg-secondary)',
-          lineHeight: '1.7'
-        }}>
-          <strong style={{ color: 'var(--fg-primary)', display: 'block', marginBottom: '8px', fontSize: 'var(--text-base)' }}>
-            💡 이용 안내
-          </strong>
-          1. 각 학교의 <strong>정문 및 행정실 앞 QR코드</strong>를 스캔하시면 해당 학교의 전용 입력 화면으로 연결됩니다.<br />
-          2. 방문 정보를 정확히 입력하시면 즉시 <strong>[학교 입장 확인증]</strong>이 발급됩니다.<br />
-          3. 관리자는 대시보드에서 방문객 현황을 실시간으로 확인하고 제어할 수 있습니다.
-        </div>
-
-        <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
-          <Link href="/admin" className="btn btn-primary">
-            🔑 통합 관리자 대시보드 바로가기
-          </Link>
-          
-          <div style={{ fontSize: 'var(--text-xs)', color: 'var(--fg-secondary)', marginTop: '8px' }}>
-            본 시스템은 교육청 및 학교 개인정보 보호 지침을 준수하며, 수집된 정보는 30일 보존 후 복구 불가능한 방법으로 자동 익명화/파기됩니다.
-          </div>
+          <a href="/admin" className="btn btn-primary" style={{ display: 'inline-block', width: 'auto', textDecoration: 'none' }}>
+            ⚙️ 관리자 대시보드 바로가기
+          </a>
         </div>
       </div>
-    </div>
+    );
+  }
+
+  return (
+    <main>
+      <CheckinForm school={school} />
+    </main>
   );
 }
