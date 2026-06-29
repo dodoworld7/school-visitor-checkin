@@ -41,8 +41,16 @@ export default function AdminDashboard({ initialSchools }: AdminDashboardProps) 
   // Visitor stats state
   const [visitors, setVisitors] = useState<Visitor[]>([]);
   const [summary, setSummary] = useState({ todayVisits: 0, currentlyIn: 0 });
+  const [todayDate, setTodayDate] = useState('');
   const [loadingVisitors, setLoadingVisitors] = useState(false);
   const [visitorError, setVisitorError] = useState('');
+
+  const formatKoreanDate = (dateStr: string) => {
+    if (!dateStr) return '';
+    const parts = dateStr.split('-');
+    if (parts.length !== 3) return dateStr;
+    return `${parts[0]}년 ${parts[1]}월 ${parts[2]}일`;
+  };
 
   // School registration form state
   const [newSchoolName, setNewSchoolName] = useState('');
@@ -69,6 +77,7 @@ export default function AdminDashboard({ initialSchools }: AdminDashboardProps) 
       }
       setVisitors(data.visitors || []);
       setSummary(data.summary || { todayVisits: 0, currentlyIn: 0 });
+      setTodayDate(data.todayDate || '');
     } catch (err: any) {
       console.error(err);
       setVisitorError(err.message || '데이터를 로드하는 동안 에러가 발생했습니다.');
@@ -413,7 +422,22 @@ export default function AdminDashboard({ initialSchools }: AdminDashboardProps) 
               marginBottom: '28px' 
             }}>
               <div>
-                <h1>당일 방문객 모니터링</h1>
+                <h1 style={{ display: 'flex', alignItems: 'center', gap: '12px', flexWrap: 'wrap' }}>
+                  당일 방문객 모니터링
+                  {todayDate && (
+                    <span style={{ 
+                      fontSize: 'var(--text-base)', 
+                      color: 'var(--primary)', 
+                      background: 'var(--primary-glow)', 
+                      padding: '4px 12px', 
+                      borderRadius: 'var(--radius-sm)', 
+                      fontWeight: 'bold',
+                      verticalAlign: 'middle'
+                    }}>
+                      {formatKoreanDate(todayDate)}
+                    </span>
+                  )}
+                </h1>
                 <p className="subtitle" style={{ fontSize: 'var(--text-sm)' }}>실시간 학교 방문 현황입니다.</p>
               </div>
 
