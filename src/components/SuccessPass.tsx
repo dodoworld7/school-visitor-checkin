@@ -214,7 +214,15 @@ export default function SuccessPass({ schoolSlug, schoolName }: SuccessPassProps
               </div>
             )}
             <button
-              onClick={() => router.push(`/checkin/${schoolSlug}`)}
+              onClick={() => {
+                sessionStorage.removeItem('visitorPass');
+                if (typeof window !== 'undefined') {
+                  window.close();
+                  setTimeout(() => {
+                    alert('출입 등록이 완료되었습니다. 브라우저 창(탭)을 닫아주세요.');
+                  }, 100);
+                }
+              }}
               className="btn btn-primary"
               style={{ background: 'linear-gradient(135deg, #4b5563 0%, #1f2937 100%)', boxShadow: '0 4px 12px rgba(31, 41, 55, 0.3)' }}
             >
