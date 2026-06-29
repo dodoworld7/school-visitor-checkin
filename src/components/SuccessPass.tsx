@@ -205,8 +205,8 @@ export default function SuccessPass({ schoolSlug, schoolName }: SuccessPassProps
         {/* Action Button */}
         {!checkedOut ? (
           <div>
-            <p style={{ fontSize: 'var(--text-sm)', color: 'var(--fg-secondary)', marginBottom: '16px' }}>
-              교내 용무를 모두 마치고 정문을 나가실 때 아래 버튼을 꼭 눌러주세요.
+            <p style={{ fontSize: 'var(--text-sm)', color: 'var(--fg-secondary)', marginBottom: '16px', fontWeight: 'bold' }}>
+              정문을 나가실 때, 다시 qr코드 입력해주세요.
             </p>
             {errorMsg && (
               <div style={{ color: 'var(--error)', fontWeight: 'bold', marginBottom: '12px', fontSize: 'var(--text-base)' }}>
@@ -214,12 +214,11 @@ export default function SuccessPass({ schoolSlug, schoolName }: SuccessPassProps
               </div>
             )}
             <button
-              onClick={handleCheckout}
-              disabled={submitting}
+              onClick={() => router.push(`/checkin/${schoolSlug}`)}
               className="btn btn-primary"
               style={{ background: 'linear-gradient(135deg, #4b5563 0%, #1f2937 100%)', boxShadow: '0 4px 12px rgba(31, 41, 55, 0.3)' }}
             >
-              {submitting ? '퇴장 처리 중...' : '지금 학교에서 퇴장하기'}
+              확인
             </button>
           </div>
         ) : (
