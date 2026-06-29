@@ -30,7 +30,6 @@ function doPost(e) {
     // 1. 연동 테스트 & 헤더 초기화
     if (action === 'test') {
       var lastRow = sheet.getLastRow();
-      var lastCol = sheet.getLastColumn();
       
       // 첫 행에 헤더가 없거나 다르면 생성
       if (lastRow === 0 || sheet.getRange(1, 1).getValue() !== headers[0]) {
@@ -79,7 +78,8 @@ function doPost(e) {
         })).setMimeType(ContentService.MimeType.JSON);
       }
       
-      var data = sheet.getRange(1, 1, lastRow, 9).getValues();
+      // getDisplayValues()를 사용하여 텍스트 형식 그대로 읽어오기 (1899년 포맷 오작동 방지)
+      var data = sheet.getRange(1, 1, lastRow, 9).getDisplayValues();
       var foundRowIndex = -1;
       
       // 최신 행부터 역순 탐색
@@ -123,10 +123,12 @@ function doPost(e) {
       var visitors = [];
       
       if (lastRow > 1) {
-        var data = sheet.getRange(1, 1, lastRow, 9).getValues();
+        // getDisplayValues()를 사용하여 셀 텍스트를 그대로 읽어옵니다. (1899년 변환 이슈 해결!)
+        var data = sheet.getRange(1, 1, lastRow, 9).getDisplayValues();
         
         for (var i = 1; i < lastRow; i++) {
-          var rowDate = data[i][0] ? Utilities.formatDate(new Date(data[i][0]), "Asia/Seoul", "yyyy-MM-dd") : '';
+          var rowDate = data[i][0] ? data[i][0].toString().trim() : '';
+          
           // 날짜 비교
           if (rowDate === todayDate) {
             todayVisits++;
@@ -172,7 +174,8 @@ function doPost(e) {
       var anonymizedCount = 0;
       
       if (lastRow > 1) {
-        var data = sheet.getRange(1, 1, lastRow, 9).getValues();
+        // getDisplayValues() 적용
+        var data = sheet.getRange(1, 1, lastRow, 9).getDisplayValues();
         var now = new Date();
         
         for (var i = 1; i < lastRow; i++) {
