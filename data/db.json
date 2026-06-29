@@ -1,0 +1,16 @@
+{
+  "schools": [
+    {
+      "id": "a3287063-1512-4e70-81dd-1ac9997d456e",
+      "slug": "school-36443165",
+      "name": "서울윤중초등학교",
+      "webAppUrl": "https://script.google.com/macros/s/AKfycbzaI-rIkwqfs-FH2tCjElTHc79PgYNn8ZktepoBuyhZwooQYFr1fT_ks3oJ4Z_FzJ1QmA/exec",
+      "spreadsheetUrl": "https://docs.google.com/spreadsheets/d/17gxDCL778wPrf57cwhsVScuRTSfGW1fzH8B2s0JG65s/edit",
+      "createdAt": "2026-06-29T01:54:48.767Z"
+    }
+  ],
+  "admin": {
+    "username": "admin",
+    "passwordHash": "ac9689e2272427085e35b9d3e3e8bed88cb3434828b43b86fc0596cad4c6e270"
+  }
+}
