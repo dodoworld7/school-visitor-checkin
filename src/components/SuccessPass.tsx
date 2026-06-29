@@ -151,7 +151,7 @@ export default function SuccessPass({ schoolSlug, schoolName }: SuccessPassProps
         </div>
 
         <h2 style={{ color: checkedOut ? 'var(--fg-secondary)' : 'var(--success)', fontSize: 'var(--text-2xl)', fontWeight: 'bold' }}>
-          {checkedOut ? '퇴장 완료' : '학교 입장 확인증'}
+          {checkedOut ? '퇴장 등록이 완료되었습니다.' : '출입 등록이 완료되었습니다.'}
         </h2>
         <p className="subtitle" style={{ fontSize: 'var(--text-base)', marginTop: '4px' }}>
           {checkedOut ? '안전히 귀가해주시기 바랍니다.' : '배움터 지킴이/보안관실에 제시 후 입장해 주세요.'}

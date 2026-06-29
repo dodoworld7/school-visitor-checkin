@@ -161,7 +161,7 @@ export default function CheckoutForm({ schoolSlug, schoolName }: CheckoutFormPro
               ✓
             </div>
             <h2 style={{ fontSize: 'var(--text-xl)', fontWeight: 'bold', color: 'var(--success)', marginBottom: '8px' }}>
-              퇴장 확인 완료
+              퇴장 등록이 완료되었습니다.
             </h2>
             <p style={{ fontSize: 'var(--text-base)', color: 'var(--fg-primary)', marginBottom: '8px' }}>
               {successMsg}
